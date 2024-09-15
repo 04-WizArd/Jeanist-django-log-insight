@@ -1,0 +1,71 @@
+{% extends "logs/base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6">Analysis Results: {{ log_file.name }}</h1>
+    
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Summary</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {% for summary in summaries %}
+            <div class="bg-gray-100 p-4 rounded">
+                <h3 class="font-bold">{{ summary.date }}</h3>
+                <p>Total Entries: {{ summary.total_entries }}</p>
+                <p>Errors: {{ summary.error_count }}</p>
+                <p>Warnings: {{ summary.warning_count }}</p>
+                <p>Info: {{ summary.info_count }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8">
+        <h2 class="text-xl font-semibold mb-4">Log Entries</h2>
+        <form method="get" class="mb-6">
+            {{ filter_form }}
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Filter
+            </button>
+        </form>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="px-4 py-2">Timestamp</th>
+                    <th class="px-4 py-2">Level</th>
+                    <th class="px-4 py-2">Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td class="border px-4 py-2">{{ entry.timestamp }}</td>
+                    <td class="border px-4 py-2">{{ entry.get_level_display }}</td>
+                    <td class="border px-4 py-2">{{ entry.message }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if entries.has_other_pages %}
+        <div class="flex justify-center mt-6">
+            <nav class="inline-flex rounded-md shadow">
+                {% if entries.has_previous %}
+                    <a href="?page={{ entries.previous_page_number }}" class="px-3 py-2 rounded-l-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                {% endif %}
+                
+                {% for num in entries.paginator.page_range %}
+                    {% if entries.number == num %}
+                        <a href="#" class="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50">{{ num }}</a>
+                    {% else %}
+                        <a href="?page={{ num }}" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if entries.has_next %}
+                    <a href="?page={{ entries.next_page_number }}" class="px-3 py-2 rounded-r-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

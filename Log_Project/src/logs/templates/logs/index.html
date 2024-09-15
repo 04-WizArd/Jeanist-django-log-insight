@@ -1,0 +1,48 @@
+{% extends "logs/base.html" %}
+
+{% block title %}Accueil - Analyseur de Logs{% endblock %}
+
+{% block header %}Tableau de bord des Logs{% endblock %}
+
+{% block content %}
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Fichiers de log récents</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Cliquez sur un fichier pour voir ses résultats d'analyse.</p>
+        </div>
+        <div class="border-t border-gray-200">
+            <ul class="divide-y divide-gray-200">
+                {% for log_file in log_files %}
+                    <li class="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                        <a href="{% url 'logs:analysis_results' log_file_id=log_file.id %}" class="block">
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-medium text-indigo-600 truncate">{{ log_file.file.name }}</p>
+                                <div class="ml-2 flex-shrink-0 flex">
+                                    <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        {{ log_file.upload_date|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 sm:flex sm:justify-between">
+                                <div class="sm:flex">
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        Téléchargé par {{ log_file.uploaded_by.username }}
+                                    </p>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="px-4 py-4 sm:px-6">
+                        <p class="text-sm text-gray-500">Aucun fichier de log n'a encore été téléchargé.</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="mt-6">
+        {% include "logs/pagination.html" with page_obj=log_files %}
+    </div>
+
+{% endblock %}
